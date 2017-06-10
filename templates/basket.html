@@ -1,0 +1,81 @@
+<h2>Farmer's Market Basket Business</h2>
+
+<table>
+  <tr>
+    <th>Product Code</th>
+    <th>Name</th>
+    <th>Price</th>
+  </tr>
+  <tr>
+    <td>CH1</td>
+    <td>Chai</td>
+    <td>$3.11</td>
+  </tr>
+  <tr>
+    <td>AP1</td>
+    <td>Apples</td>
+    <td>$6.00</td>
+  </tr>
+  <tr>
+    <td>CF1</td>
+    <td>Coffee</td>
+    <td>$11.23</td>
+  </tr>
+  <tr>
+    <td>MK1</td>
+    <td>Milk</td>
+    <td>$4.75</td>
+  </tr>
+  <tr>
+    <td>OM1</td>
+    <td>Oatmeal</td>
+    <td>$3.69</td>
+  </tr>
+</table><br>
+
+<table>
+  <tr>
+    <th>Discount Code</th>
+    <th>Description</th>
+    <th>Limitation</th>
+  </tr>
+  <tr>
+    <td>BOGO</td>
+    <td>Buy-One-Get-One-Free Special on Coffee</td>
+    <td>Unlimited</td>
+  </tr>
+  <tr>
+    <td>APPL</td>
+    <td>If you buy 3 or more bags of Apples, the price drops to $4.50</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>CHMK</td>
+    <td>Purchase a box of Chai and get milk free</td>
+    <td>Limit 1</td>
+  </tr>
+</table><hr><br>
+
+<form action="/retail" method="POST">
+  Product Code: <input type="text" name="product_code"></input>
+  Quantity: <input type="number" name="quantity" min=0></input>
+  <input type="submit"></input>
+</form><br>
+
+{% for item in items %}
+  <p> {{ item.product_code }} {{ item.quantity * item.price }} </p>
+  {% if item.discount_code %}
+    <p> {{ item.discount_code }} {{ item.discount_amount }} </p>
+  {% endif %}
+{% endfor %}
+<br>
+
+{% set total = [0] %}
+{% for item in items %}
+  {% if total.append(total.pop()+ item["total"]) %}{% endif %}
+{% endfor %}
+<strong>Total: {{ total }} </strong><br><br>
+
+<form action="/delete" method="POST">
+  <input type="submit" class="delete" value="Delete DB"></input>
+</form>
