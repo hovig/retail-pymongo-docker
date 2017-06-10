@@ -3,7 +3,9 @@ import os
 from flask import Flask, redirect, url_for, request, render_template
 
 app = Flask(__name__)
-appl_list, chai_list, co_list, mk_list = [], [], [], []
+
+global ch_listo, mk_listo, ap_listo, cf_listo
+ch_listo, mk_listo, ap_listo, cf_listo = [], [], [], []
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.basketdb
 product_names = {
@@ -36,6 +38,8 @@ def basket():
 
 @app.route('/retail', methods=['POST'])
 def retail():
+    flag = False
+    cf_total, ap_total, ch_total, mk_total, om_total = 0, 0, 0, 0, 0
     total, ch_count, ap_count, cf_count, mk_count = 0, 0, 0, 0, 0
     product_code, product, price, quantity, discount_code, discount_amount = request.form['product_code'].upper(), '', 0, int(request.form['quantity']), '', 1
     if product_code in product_codes:
@@ -43,44 +47,51 @@ def retail():
         price = product_prices[product_code]
         if product_code == 'CF1':
             cf_count += 1
-            co_list.append(cf_count)
-            if cf_count % 2 == 0 or quantity % 2 == 0 or len(co_list) % 2 == 0:
-                discount_code = 'BOGO'
-                discount_amount = discounts[discount_code]
-                total += quantity * price + (quantity/2)*discount_amount
+            cf_listo.append(cf_count)
+            if len(cf_listo) == 1:
+                cf_total += quantity * price
             else:
-                discount_code = 'BOGO'
-                discount_amount = discounts[discount_code]
-                total += quantity * price + ((quantity-1)/2)*discount_amount
+                if len(cf_listo) % 2 == 0:
+                    discount_code = 'BOGO'
+                    discount_amount = discounts[discount_code]
+                    cf_total += quantity * price + (len(cf_listo)/2)*discount_amount
+                else:
+                    discount_code = 'BOGO'
+                    discount_amount = discounts[discount_code]
+                    cf_total += quantity * price + ((len(cf_listo)-1)/2)*discount_amount + (len(cf_listo)%2)*discount_amount
         elif product_code == 'AP1':
             ap_count += 1
-            appl_list.append(ap_count)
-            if ap_count >= 3 or quantity >= 3 or len(appl_list) >= 3:
+            ap_listo.append(ap_count)
+            if len(ap_listo) >= 3:
                 discount_code = 'APPL'
                 discount_amount = discounts[discount_code]
-                total += quantity * price + quantity * discount_amount
+                ap_total += quantity * price + len(ap_listo) * discount_amount
             else:
-                total += quantity * price
+                ap_total += quantity * price
         elif product_code == 'CH1':
-            ch_count += 1
-            chai_list.append(ch_count)
-            if (ch_count == 1 and mk_count == 1) or (len(chai_list) >= 1 and len(mk_list) == 1) or (len(chai_list) == 1 and len(mk_list) >= 1):
+            ch_count = ch_count + 1
+            ch_listo.append(ch_count)
+            if len(ch_listo) > 1:
+                flag = True
+            if len(mk_listo) == 1 and flag == False:
                 discount_code = 'CHMK'
                 discount_amount = discounts[discount_code]
-                total += price + discount_amount
+                ch_total += price + discount_amount
             else:
-                total += quantity * price
+                ch_total += quantity * price
         elif product_code == 'MK1':
             mk_count += 1
-            mk_list.append(mk_count)
-            if (ch_count == 1 and mk_count == 1) or (len(chai_list) >= 1 and len(mk_list) == 1) or (len(chai_list) >= 1 and len(mk_list) == 1):
+            mk_listo.append(mk_count)
+            if len(mk_listo) > 1:
+                flag = True
+            if len(ch_listo) == 1 and flag == False:
                 discount_code = 'CHMK'
                 discount_amount = discounts[discount_code]
-                total += price + discount_amount
+                mk_total += price + discount_amount
             else:
-                total += quantity * price
+                mk_total += quantity * price
         elif product_code == 'OM1':
-            total += quantity * price
+            om_total += quantity * price
         else:
             return
     else:
@@ -92,13 +103,26 @@ def retail():
         'quantity': quantity,
         'discount_code': discount_code,
         'discount_amount': discount_amount,
-        'total': total
+        'total': ap_total+ch_total+cf_total+mk_total+om_total,
+        'ch_count': ch_count,
+        'ap_count': ap_count,
+        'cf_count': cf_count,
+        'mk_count': mk_count,
+        'ap_total': ap_total,
+        'ch_total': ch_total,
+        'cf_total': cf_total,
+        'mk_total': mk_total,
+        'om_total': om_total
     }
     db.basketdb.insert_one(item_doc)
     return redirect(url_for('basket'))
 
 @app.route('/delete', methods=['POST'])
 def delete():
+    del ch_listo[:]
+    del mk_listo[:]
+    del ap_listo[:]
+    del cf_listo[:]
     db.basketdb.delete_many({})
     return redirect(url_for('basket'))
 

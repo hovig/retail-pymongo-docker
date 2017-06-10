@@ -60,7 +60,7 @@
   Product Code: <input type="text" name="product_code"></input>
   Quantity: <input type="number" name="quantity" min=0></input>
   <input type="submit"></input>
-</form><br>
+</form>
 
 {% for item in items %}
   <p> {{ item.product_code }} {{ item.quantity * item.price }} </p>
@@ -72,10 +72,10 @@
 
 {% set total = [0] %}
 {% for item in items %}
-  {% if total.append(total.pop()+ item["total"]) %}{% endif %}
+  {% if total.append(total.pop() + item["total"]) %}{% endif %}
 {% endfor %}
 <strong>Total: {{ total }} </strong><br><br>
 
 <form action="/delete" method="POST">
-  <input type="submit" class="delete" value="Delete DB"></input>
+  <input type="submit" class="delete" value="Reset List"></input>
 </form>
