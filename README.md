@@ -20,5 +20,7 @@
 
 1) docker pull hovig/retail-pymongo
 2) docker run hovig/retail-pymongo
+
 **or**
+
 `Steps 4, 5 & 6`
