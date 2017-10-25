@@ -1,6 +1,3 @@
-version: '1.0'
-services:
-  image: hovig/retail-pymongo
 web:
   build: .
   command: python -u app.py
