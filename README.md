@@ -13,7 +13,7 @@
 3) cd path to retail-pymongo-docker
 4) docker-compose build
 5) docker-compose up
-6) `![http://localhost:5000](http://localhost:5000)`
+6) [http://localhost:5000](http://localhost:5000)
 
 
 > _Virtual Machine (VM)_:
