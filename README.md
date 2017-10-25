@@ -1,5 +1,5 @@
 
-## Steps to run this projects docker container:
+## Steps to run this project's docker container:
 
 > _Docker Hub_:
 
@@ -21,6 +21,6 @@
 1) docker pull hovig/retail-pymongo
 2) docker run hovig/retail-pymongo
 
-**or**
+  **or**
 
-`Steps 4, 5 & 6`
+  `Steps 4, 5 & 6`
