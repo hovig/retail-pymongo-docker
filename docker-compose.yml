@@ -1,3 +1,4 @@
+version: '1.0'
 services:
   image: hovig/retail-pymongo
 web:
